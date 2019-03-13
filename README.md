@@ -25,10 +25,94 @@ ajax跨域问题笔记
 可以通过filter实现，若为简单协议：即方法为：post,get,head,请求header里面无自定义头，且Content-Type为以下几种：<br>
 text/plain,multipart/form-data,application/x-www-form-urlencoded<br>
 在filter中：<br>
+```java
+public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
+		HttpServletResponse res = (HttpServletResponse) response;
+		//*可以换成详细地址
+		res.addHeader("Access-Control-Allow-Origin", "*");
+		//*可以换成详细get/post方法
+		res.addHeader("Access-Control-Allow-Methods", "*");
+		chain.doFilter(request, response);
+	}
+```
+若为非简单协议：在工作中常见的有：put,delete方法的ajax请求,发送json格式的ajax请求以及带自定义头的ajax请求<br>
+需要在header中加Content-Type
+```java
+public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
+		HttpServletResponse res = (HttpServletResponse) response;
+		//*可以换成详细地址
+		res.addHeader("Access-Control-Allow-Origin", "*");
+		//*可以换成详细方法
+		res.addHeader("Access-Control-Allow-Methods", "*");
+		//非简单协议需要加Content-Type
+		res.addHeader("Access-Control-Allow-Header", "Content-Type");
+		//设置浏览器缓存头时间
+		res.addHeader("Access-Control-Max-Age", "3600");
+		chain.doFilter(request, response);
+	}
+```
+##### 注意：带cookie的时候，origin必须是全匹配，不能使用*，且需要设置Credentials==true
+```java
+public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
+		HttpServletResponse res = (HttpServletResponse) response;
+		//带cookie的时候，origin必须是全匹配，不能使用*
+		res.addHeader("Access-Control-Allow-Origin", "http://localhost:8081");
+		//*可以换成详细方法
+		res.addHeader("Access-Control-Allow-Methods", "*");
+		//非简单协议需要加Content-Type
+		res.addHeader("Access-Control-Allow-Header", "Content-Type");
+		//设置浏览器缓存头时间
+		res.addHeader("Access-Control-Max-Age", "3600");
+		chain.doFilter(request, response);
+		
+		//enable cookie
+		res.addHeader("Access-Control-Allow-Credentials", "true");
+	}
+```
+由于带cookie的时候，origin必须是全匹配，不能使用*，所以其他端口无法使用，因此可以利用request.getHeader获取orgin实现通用匹配:
+```java
+public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
+
+		HttpServletResponse res = (HttpServletResponse) response;
+		
+		HttpServletRequest req = (HttpServletRequest) request;
+		
+		String origin = req.getHeader("Origin");
+		
+		if (!org.springframework.util.StringUtils.isEmpty(origin)) {
+			//带cookie的时候，origin必须是全匹配，不能使用*
+			res.addHeader("Access-Control-Allow-Origin", origin);			
+		}
+		
+		res.addHeader("Access-Control-Allow-Methods", "*");
+		
+		String headers = req.getHeader("Access-Control-Request-Headers");
+		
+		// 支持所有自定义头
+		if (!org.springframework.util.StringUtils.isEmpty(headers)) {
+			res.addHeader("Access-Control-Allow-Headers", headers);			
+		}
+		
+		res.addHeader("Access-Control-Max-Age", "3600");
+		
+		// enable cookie
+		res.addHeader("Access-Control-Allow-Credentials", "true");
+		
+		chain.doFilter(request, response);
+	}
+```
+##### 若在spirng框架上解决被调用方：只需要在跨域controller类或者方法上加上@CrossOrigin注解
+##### Apache/nginx服务器：
+
+#### 被调用方方式:
+Apache服务器：<br>
+nginx服务器：<br>
 
 
-
-	
 
 
 
