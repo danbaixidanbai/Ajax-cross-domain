@@ -11,8 +11,23 @@ ajax跨域问题笔记
 ③通过被调用方和调用方方式解决<br>
 ## 以下主要以第二和第三为主
 ### 通过更换XHR(XmlHttpRequest)请求：
-常用方式为：jsonp
+常用方式为：jsonp：jsonp为js脚本<script>，因为JSONP之所以能够用来解决跨域方案,主要是因为 <script> 脚本拥有跨域能力。<br>
+但是后台需要改动需要继承 AbstractJsonpResponseBodyAdvice类 构造方法调用父类来实现后台默认的协议（前后端默认为callback）<br>
 	
+	
+#### jsonp缺点:
+1.服务器需要改动<br>
+2.只支持get请求，不支持post请求<br>
+3.发送的不是XHR请求，最好通过解决URL跨域比较好<br>
+		
+### 通过被调用方和调用方方式解决：
+#### 被调用方方式:
+可以通过filter实现，若为简单协议：即方法为：post,get,head,请求header里面无自定义头，且Content-Type为以下几种：<br>
+text/plain,multipart/form-data,application/x-www-form-urlencoded<br>
+在filter中：<br>
+
+
+
 	
 
 
