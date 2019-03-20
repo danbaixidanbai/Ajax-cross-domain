@@ -10,7 +10,7 @@ ajax跨域问题笔记
 ②通过更换XHR(XmlHttpRequest)请求<br>
 ③通过被调用方和调用方方式解决<br>
 所谓被调用方方式：基于http协议关于跨域方面的规定：通过http协议响应头部里面增加指定的字段让其支持跨域<br>
-而调用方方式则为通过http服务器如:Apache/nginx，基于隐藏跨域的方式实现
+而调用方方式则为通过http服务器如:Apache/nginx反向代理，基于隐藏跨域的方式实现
 ## 以下主要以第二和第三为主
 ### 通过更换XHR(XmlHttpRequest)请求：
 常用方式为：jsonp：jsonp为js脚本<script>，因为JSONP之所以能够用来解决跨域方案,主要是因为 <script> 脚本拥有跨域能力。<br>
@@ -112,7 +112,7 @@ public void doFilter(ServletRequest request, ServletResponse response, FilterCha
 
 #### 被调用方方式:
 Apache服务器：<br>
-nginx服务器：<br>
+nginx服务器：反向代理<br>
 
 
 
